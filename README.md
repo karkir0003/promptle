@@ -1,2 +1,2 @@
 # prompt-engineering-game
-Prompt Engineering Game for generating impages
+Prompt Engineering Game for generating images
