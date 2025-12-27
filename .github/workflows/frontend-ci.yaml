@@ -21,10 +21,8 @@ jobs:
           node-version: '24'
           cache: 'yarn'
 
-      - name: 🧶 Install Dependencies
-        # --frozen-lockfile ensures we use the EXACT versions from yarn.lock
+      - name: Install Dependencies
         run: yarn install --frozen-lockfile
 
-      - name: 🧹 Run Linter
-        # Fails if there are ESLint errors (crucial for keeping code clean)
+      - name: Run Linter
         run: yarn lint
