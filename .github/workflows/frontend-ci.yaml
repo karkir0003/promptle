@@ -25,7 +25,9 @@ jobs:
         run: yarn install --frozen-lockfile
       
       - name: Prettify code
-        uses: creyD/prettier_action@v4.3
+        uses: creyD/prettier_action@v4.6
+        with:
+          no_commit: true
 
       - name: Run Linter
         run: yarn lint
