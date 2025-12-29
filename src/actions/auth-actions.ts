@@ -48,8 +48,6 @@ export async function signUpWithPassword(
 ): Promise<AuthState> {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
-  console.log("[signUpWithPassword] email", email);
-  console.log("[signUpWithPassword] password", password);
 
   if (!email || !password) {
     return { success: false, error: "Email and password are required" };
@@ -60,8 +58,6 @@ export async function signUpWithPassword(
     email,
     password,
   });
-
-  console.log("[signUpWithPassword] error", error);
 
   if (error) {
     return { success: false, error: error.message };
