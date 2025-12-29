@@ -11,7 +11,6 @@ export async function submitGuess(formData: FormData): Promise<GameResult> {
   await new Promise((resolve) => setTimeout(resolve, 2000));
 
   const prompt = formData.get("prompt") as string;
-  console.log("SERVER: Received prompt:", prompt);
 
   // 2. Return a "Mock" result
   return {
