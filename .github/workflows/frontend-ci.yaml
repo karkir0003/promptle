@@ -31,7 +31,8 @@ jobs:
         uses: creyD/prettier_action@v4.6
         with:
           commit_message: "chore: auto-fix prettier formatting"
-          prettier_options: "**/*.{js,jsx,ts,tsx,json,yaml,yml,md,css,scss}"
+          file_pattern: "src"
+          prettier_options: --write **/*.{js,jsx,ts,tsx,json,yaml,yml,md,css,scss}
         
       - name: Reinstall Dependencies (if needed)
         run: yarn install --frozen-lockfile
