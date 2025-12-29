@@ -39,10 +39,6 @@ export async function signInWithPassword(
     return { success: false, error: error.message };
   }
 
-<<<<<<< HEAD
-=======
-  // Success! Redirect OUTSIDE of any try/catch
->>>>>>> fe3f4976dbdd006691f472e150a791918b0f6aff
   revalidatePath("/", "layout");
   redirect("/daily-challenge");
 }
