@@ -12,14 +12,10 @@ export function GoogleSignInButton() {
     setIsLoading(true);
     const result = await signInWithGoogle();
 
-    if ("error" in result) {
+    if (result?.error) {
       setIsLoading(false);
       toast.error(result.error);
       return;
-    }
-
-    if ("url" in result) {
-      window.location.href = result.url;
     }
   };
 
