@@ -1,8 +1,10 @@
 "use client";
 
 import { useActionState } from "react";
-import { signInWithPassword, signUpWithPassword } from "@/actions/auth-actions";
+import { Button } from "@/components/ui/button";
+import { signInWithGoogle, signInWithPassword, signUpWithPassword } from "@/actions/auth-actions";
 import { Loader2, Lock } from "lucide-react";
+import { FcGoogle } from "react-icons/fc";
 
 export default function LoginPage() {
   // hook: [state, actionFunction, isPending]
@@ -31,6 +33,25 @@ export default function LoginPage() {
 
         {/* Form */}
         <form className="space-y-4">
+        {/* Google Button */}
+          <div className="flex flex-col gap-2">
+            <button
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-zinc-200 bg-white px-4 py-2 text-sm font-medium hover:bg-zinc-100 disabled:opacity-50"
+              onClick={() => signInWithGoogle()}
+              type="button"
+            >
+              <FcGoogle className="h-5 w-5" />
+              Sign in with Google
+            </button>
+
+            <div className="relative flex items-center py-2">
+              <div className="flex-grow border-t border-zinc-200"></div>
+              <span className="flex-shrink-0 mx-4 text-xs text-zinc-500">
+                OR
+              </span>
+              <div className="flex-grow border-t border-zinc-200"></div>
+            </div>
+          </div>
           <div className="space-y-2">
             <label className="text-sm font-medium leading-none" htmlFor="email">
               Email
