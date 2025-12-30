@@ -17,10 +17,6 @@ export function GoogleSignInButton() {
       toast.error(result.error);
       return;
     }
-
-    if (result && "url" in result) {
-      window.location.href = result.url;
-    }
   };
 
   return (
