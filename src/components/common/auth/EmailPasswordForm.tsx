@@ -32,11 +32,14 @@ export function EmailPasswordForm() {
       </div>
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium leading-none" htmlFor="password">
+          <label
+            className="text-sm font-medium leading-none"
+            htmlFor="password"
+          >
             Password
           </label>
-          <Link 
-            href="/forgot-password" 
+          <Link
+            href="/forgot-password"
             className="text-xs text-zinc-500 hover:text-zinc-900 hover:underline"
           >
             Forgot password?

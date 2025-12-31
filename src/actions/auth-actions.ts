@@ -47,7 +47,7 @@ export async function signInWithPassword(
  */
 export async function resetPassword(
   prevState: AuthState,
-  formData: FormData
+  formData: FormData,
 ): Promise<AuthState> {
   const email = formData.get("email") as string;
 
@@ -56,7 +56,7 @@ export async function resetPassword(
   }
 
   const supabase = await createClient();
-  
+
   const origin = (await headers()).get("origin");
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -80,13 +80,16 @@ export async function resetPassword(
  */
 export async function updatePassword(
   prevState: AuthState,
-  formData: FormData
+  formData: FormData,
 ): Promise<AuthState> {
   const password = formData.get("password") as string;
   const confirmPassword = formData.get("confirmPassword") as string;
 
   if (!password || !confirmPassword) {
-    return { success: false, error: "Password and confirm password are required" };
+    return {
+      success: false,
+      error: "Password and confirm password are required",
+    };
   }
 
   if (password !== confirmPassword) {

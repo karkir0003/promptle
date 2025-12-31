@@ -6,7 +6,10 @@
 export const AUTH_ROUTES = ["/login", "/auth", "/forgot-password"] as const;
 
 /** Routes only accessible to authenticated users */
-export const PROTECTED_ROUTES = ["/daily-challenge", "/update-password"] as const;
+export const PROTECTED_ROUTES = [
+  "/daily-challenge",
+  "/update-password",
+] as const;
 
 /** Default redirect destination for authenticated users */
 export const DEFAULT_AUTH_REDIRECT = "/daily-challenge";
