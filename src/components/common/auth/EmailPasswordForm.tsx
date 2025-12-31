@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { signInWithPassword, signUpWithPassword } from "@/actions/auth-actions";
 import { Loader2 } from "lucide-react";
+import Link from "next/link";
 
 export function EmailPasswordForm() {
   const [loginState, loginAction, isLoginPending] = useActionState(
@@ -30,9 +31,17 @@ export function EmailPasswordForm() {
         />
       </div>
       <div className="space-y-2">
-        <label className="text-sm font-medium leading-none" htmlFor="password">
-          Password
-        </label>
+        <div className="flex items-center justify-between">
+          <label className="text-sm font-medium leading-none" htmlFor="password">
+            Password
+          </label>
+          <Link 
+            href="/forgot-password" 
+            className="text-xs text-zinc-500 hover:text-zinc-900 hover:underline"
+          >
+            Forgot password?
+          </Link>
+        </div>
         <input
           id="password"
           name="password"
