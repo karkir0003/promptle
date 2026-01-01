@@ -5,6 +5,7 @@ on:
     branches: [ "main" ]
       paths:
         - 'supabase/**'
+        - 'src/types/supabase.ts'
   push:
     branches: [main]
 
