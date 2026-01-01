@@ -15,6 +15,15 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'yarn'
+
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+
       - uses: supabase/setup-cli@v1
         with:
           version: latest
