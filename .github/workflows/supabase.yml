@@ -2,6 +2,9 @@ name: Supabase CI
 
 on:
   pull_request:
+    branches: [ "main" ]
+      paths:
+        - 'supabase/**'
   push:
     branches: [main]
 
