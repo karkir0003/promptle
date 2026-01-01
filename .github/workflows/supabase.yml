@@ -1,0 +1,32 @@
+name: Supabase CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start Supabase Locally
+        run: supabase start
+
+      - name: Lint Database
+        run: supabase db lint
+
+      # 3. Check for Type Drift
+      # This generates types and checks if they match what you committed.
+      - name: Verify Generated Types
+        run: |
+          supabase gen types typescript --local > src/types/supabase.ts
+          if [ -n "$(git status --porcelain src/types/supabase.ts)" ]; then
+            echo "Error: Database types are out of sync. Run 'supabase gen types' and commit."
+            exit 1
+          fi
