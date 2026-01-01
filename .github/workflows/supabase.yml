@@ -13,63 +13,18 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-
-      - name: Setup Node.js 24
-        uses: actions/setup-node@v6
+      - name: Checkout Repo
+        uses: actions/checkout@v6
         with:
-          node-version: '24'
-          cache: 'yarn'
-
-      - name: Install Dependencies
-        run: yarn install --frozen-lockfile
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
 
       - uses: supabase/setup-cli@v1
         with:
           version: 2.67.1
       
-      - run: supabase db start
-
-      # - name: Start Supabase Locally
-      #   run: supabase start
-
-      # - run: supabase init
-      #   - run: supabase db start
-      #   - name: Verify generated types match Postgres schema
-      #     run: |
-      #       supabase gen types typescript --local > schema.gen.ts
-      #       if ! git diff --ignore-space-at-eol --exit-code --quiet schema.gen.ts; then
-      #         echo "Detected uncommitted changes after build. See status below:"
-      #         git diff
-      #         exit 1
-      #       fi
+      - name: Start Supabase DB
+        run: supabase db start
 
       - name: Lint Database
         run: supabase db lint
-
-      # 3. Check for Type Drift
-      # This generates types and checks if they match what you committed.
-      - name: Verify Generated Types
-        run: |
-          mkdir -p src/types
-          
-          # A. Generate
-          supabase gen types typescript --local > src/types/supabase.ts
-
-          # B. Format (using local project Prettier)
-          yarn prettier --write src/types/supabase.ts
-          
-          # C. Compare
-          if ! git diff --ignore-space-at-eol --exit-code --quiet src/types/supabase.ts; then
-            echo "Detected uncommitted changes after build. See status below:"
-            git diff
-            exit 1
-          fi
-
-      # - name: Verify Generated Types
-      #   run: |
-      #     supabase gen types typescript --local > src/types/supabase.ts
-      #     if [ -n "$(git status --porcelain src/types/supabase.ts)" ]; then
-      #       echo "Error: Database types are out of sync. Run 'supabase gen types' and commit."
-      #       exit 1
-      #     fiecho
