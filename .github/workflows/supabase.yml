@@ -19,7 +19,6 @@ jobs:
         with:
           version: latest
       
-      - run: supabase init
       - run: supabase db start
 
       # - name: Start Supabase Locally
