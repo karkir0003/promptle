@@ -5,13 +5,12 @@ interface GenerateImageResponse {
   imageUrl: string;
   width?: number;
   height?: number;
-  seed?: number;
   inferenceTime?: number;
   error?: string;
 }
 
 /**
- * Generates an image using Fal.ai and saves it to the guess
+ * Generates an image using Hugging Face and saves it to the guess
  */
 export async function generateImage(
   prompt: string,
@@ -42,6 +41,20 @@ export async function generateImage(
 
     if (!response.ok) {
       const errorText = await response.text();
+      
+      // Handle specific error cases
+      if (response.status === 503) {
+        throw new Error(
+          "The AI model is loading. Please wait a moment and try again."
+        );
+      }
+      
+      if (response.status === 429) {
+        throw new Error(
+          "Too many requests. Please wait a moment before trying again."
+        );
+      }
+      
       throw new Error(
         `Image generation error: ${response.status}\n Message: ${errorText}`,
       );
@@ -56,6 +69,21 @@ export async function generateImage(
     }
   } catch (error) {
     console.error("Error generating image:", error);
+    
+    // Provides helpful error messages
+    if (error instanceof Error) {
+      if (error.message.includes("loading")) {
+        throw new Error(
+          "Model is warming up. This usually takes 20-30 seconds. Please try again shortly."
+        );
+      }
+      if (error.message.includes("rate limit")) {
+        throw new Error(
+          "Rate Limit Exceeded."
+        );
+      }
+    }
+    
     throw new Error("Failed to generate image. Please try again.");
   }
 }

@@ -112,11 +112,12 @@ Deno.serve(async (req) => {
 
     // Generate CLIP embedding using your Hugging Face Space
     console.log('Generating CLIP embedding using clip-embedding-service...')
+    console.log('Calling URL:', `${clipServiceUrl}/api/image-embedding`)
     
     let embeddingArray: number[] | null = null
     
     try {
-      const embeddingResponse = await fetch(clipServiceUrl, {
+      const embeddingResponse = await fetch(`${clipServiceUrl}/api/image-embedding`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -142,7 +143,7 @@ Deno.serve(async (req) => {
         embeddingArray = null
       }
     } catch (error) {
-      console.log('Could not pre-generate embedding, will compute on-demand:', error)
+      console.error('Could not pre-generate embedding, will compute on-demand:', error)
       embeddingArray = null
     }
 

@@ -6,21 +6,6 @@ interface GenerateImageRequest {
   guessId?: string;
 }
 
-interface FalAIResponse {
-  images: Array<{
-    url: string;
-    width: number;
-    height: number;
-    content_type: string;
-  }>;
-  timings: {
-    inference: number;
-  };
-  seed: number;
-  has_nsfw_concepts: boolean[];
-  prompt: string;
-}
-
 Deno.serve(async (req) => {
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
@@ -34,12 +19,12 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const falApiKey = Deno.env.get("FAL_API_KEY") ?? "";
     const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+    const huggingfaceSpaceUrl = Deno.env.get("HUGGINGFACE_IMAGE_GEN_SPACE_URL") ?? "";
 
-    if (!falApiKey) {
-      throw new Error("Missing FAL_API_KEY");
+    if (!huggingfaceSpaceUrl) {
+      throw new Error("Missing HUGGINGFACE_IMAGE_GEN_SPACE_URL");
     }
 
     // Parse request body
@@ -73,44 +58,98 @@ Deno.serve(async (req) => {
     }
 
     console.log("Generating image for prompt:", prompt);
+    const startTime = Date.now();
 
-    // Call Fal.ai Flux Dev model
-    const response = await fetch("https://fal.run/fal-ai/flux/dev", {
+    console.log("Calling Hugging Face Space:", huggingfaceSpaceUrl);
+    const fullUrl = `${huggingfaceSpaceUrl}/api/generate`;
+    console.log("Full URL:", fullUrl);
+    
+    const response = await fetch(fullUrl, {
       method: "POST",
       headers: {
-        Authorization: `Key ${falApiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
         prompt: prompt,
-        image_size: "square_hd", // 1024x1024
-        num_inference_steps: 28,
-        num_images: 1,
-        enable_safety_checker: true,
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Fal.ai API error:", response.status, errorText);
-      throw new Error(`Fal.ai API error: ${response.status} - ${errorText}`);
+      console.error("Hugging Face Space error:", response.status, errorText);
+      
+      // Handle specific errors
+      if (response.status === 503) {
+        throw new Error("Model is loading. Please wait 20-30 seconds and try again.");
+      }
+      
+      throw new Error(`Hugging Face Space error: ${response.status} - ${errorText}`);
     }
 
-    const result: FalAIResponse = await response.json();
+    const result = await response.json();
+    console.log("Space response received");
 
-    console.log("Image generated successfully");
-    console.log("Inference time:", result.timings.inference, "seconds");
+    // Check if generation was successful
+    if (!result.success) {
+      throw new Error(result.error || "Image generation failed");
+    }
 
-    const imageUrl = result.images[0].url;
+    if (!result.image) {
+      throw new Error("No image returned from Space");
+    }
 
-    // If guessId is provided, save the generated image to the guesses table
-    if (guessId && supabaseUrl && supabaseServiceKey) {
+    // Parse base64 image
+    console.log("Parsing base64 image data");
+    const base64Data = result.image.includes("base64,") 
+      ? result.image.split("base64,")[1] 
+      : result.image;
+    
+    const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+    const imageBlob = new Blob([binaryData], { type: "image/png" });
+
+    const inferenceTime = (Date.now() - startTime) / 1000;
+    console.log("Image generated successfully in", inferenceTime, "seconds");
+
+    // Upload image to Supabase Storage
+    console.log("Uploading image to Supabase Storage...");
+    
+    if (!supabaseUrl || !supabaseServiceKey) {
+      throw new Error("Missing Supabase credentials for storage upload");
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    
+    // Generate a unique filename
+    const filename = `generated/${guessId || crypto.randomUUID()}.png`;
+    
+    // Convert blob to ArrayBuffer for Supabase upload
+    const arrayBuffer = await imageBlob.arrayBuffer();
+    
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from("generated-images")
+      .upload(filename, arrayBuffer, {
+        contentType: "image/png",
+        upsert: true,
+      });
+
+    if (uploadError) {
+      console.error("Error uploading to storage:", uploadError);
+      throw new Error("Failed to upload image to storage");
+    }
+
+    // Get public URL
+    const { data: { publicUrl } } = supabase.storage
+      .from("generated-images")
+      .getPublicUrl(filename);
+
+    console.log("Image uploaded to:", publicUrl);
+
+    // If guessId is provided, update the guess record
+    if (guessId) {
       try {
-        const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
         const { error: updateError } = await supabase
           .from("guesses")
-          .update({ generated_image_url: imageUrl })
+          .update({ generated_image_url: publicUrl })
           .eq("id", guessId);
 
         if (updateError) {
@@ -127,11 +166,10 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: true,
-        imageUrl: imageUrl,
-        width: result.images[0].width,
-        height: result.images[0].height,
-        seed: result.seed,
-        inferenceTime: result.timings.inference,
+        imageUrl: publicUrl,
+        width: 512,
+        height: 512,
+        inferenceTime: inferenceTime,
       }),
       {
         headers: {
