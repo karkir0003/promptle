@@ -1,7 +1,7 @@
 import "server-only";
 
 /**
- * Calculates CLIP similarity score by comparing the generated image 
+ * Calculates CLIP similarity score by comparing the generated image
  * with the target challenge image
  * Throws an error if the score cannot be calculated
  */

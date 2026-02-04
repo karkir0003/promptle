@@ -11,7 +11,11 @@ interface ResultViewProps {
   attemptsRemaining: number;
 }
 
-export function ResultView({ result, onReset, attemptsRemaining }: ResultViewProps) {
+export function ResultView({
+  result,
+  onReset,
+  attemptsRemaining,
+}: ResultViewProps) {
   console.log("Result score:", result.score, "Type:", typeof result.score);
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-green-500";
@@ -25,7 +29,9 @@ export function ResultView({ result, onReset, attemptsRemaining }: ResultViewPro
       {/* Score Display */}
       <Card className="p-8 text-center bg-gradient-to-br from-primary/10 to-primary/5">
         <div className="space-y-4">
-          <p className="text-sm text-muted-foreground uppercase tracking-wide">Your Score</p>
+          <p className="text-sm text-muted-foreground uppercase tracking-wide">
+            Your Score
+          </p>
           <div className={`text-6xl font-bold ${getScoreColor(result.score)}`}>
             {result.score.toFixed(0)}%
           </div>
@@ -45,27 +51,20 @@ export function ResultView({ result, onReset, attemptsRemaining }: ResultViewPro
               priority
             />
           </div>
-          <p className="text-xs text-muted-foreground mt-2">Your generated image</p>
+          <p className="text-xs text-muted-foreground mt-2">
+            Your generated image
+          </p>
         </Card>
       )}
 
       {/* Action Buttons */}
       <div className="flex gap-3">
         {attemptsRemaining > 0 ? (
-          <Button
-            onClick={onReset}
-            size="lg"
-            className="flex-1"
-          >
+          <Button onClick={onReset} size="lg" className="flex-1">
             Try Again ({attemptsRemaining} left)
           </Button>
         ) : (
-          <Button
-            disabled
-            size="lg"
-            className="flex-1"
-            variant="outline"
-          >
+          <Button disabled size="lg" className="flex-1" variant="outline">
             No Attempts Left
           </Button>
         )}

@@ -24,37 +24,34 @@ export async function generateImage(
       throw new Error("Missing Supabase credentials");
     }
 
-    const response = await fetch(
-      `${supabaseUrl}/functions/v1/generate-image`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${serviceRoleKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          prompt,
-          guessId,
-        }),
+    const response = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${serviceRoleKey}`,
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({
+        prompt,
+        guessId,
+      }),
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
-      
+
       // Handle specific error cases
       if (response.status === 503) {
         throw new Error(
-          "The AI model is loading. Please wait a moment and try again."
+          "The AI model is loading. Please wait a moment and try again.",
         );
       }
-      
+
       if (response.status === 429) {
         throw new Error(
-          "Too many requests. Please wait a moment before trying again."
+          "Too many requests. Please wait a moment before trying again.",
         );
       }
-      
+
       throw new Error(
         `Image generation error: ${response.status}\n Message: ${errorText}`,
       );
@@ -69,21 +66,19 @@ export async function generateImage(
     }
   } catch (error) {
     console.error("Error generating image:", error);
-    
+
     // Provides helpful error messages
     if (error instanceof Error) {
       if (error.message.includes("loading")) {
         throw new Error(
-          "Model is warming up. This usually takes 20-30 seconds. Please try again shortly."
+          "Model is warming up. This usually takes 20-30 seconds. Please try again shortly.",
         );
       }
       if (error.message.includes("rate limit")) {
-        throw new Error(
-          "Rate Limit Exceeded."
-        );
+        throw new Error("Rate Limit Exceeded.");
       }
     }
-    
+
     throw new Error("Failed to generate image. Please try again.");
   }
 }

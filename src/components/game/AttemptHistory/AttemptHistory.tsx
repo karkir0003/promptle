@@ -39,7 +39,7 @@ export function AttemptHistory({ attempts }: AttemptHistoryProps) {
                   />
                 </div>
               )}
-              
+
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">

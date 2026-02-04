@@ -117,7 +117,7 @@ export async function submitGuess(
     //Generates the image using the user's prompt
     console.log("Generating image for prompt:", prompt);
     const imageResult = await generateImage(prompt, guess.id);
-    
+
     if (!imageResult.success || !imageResult.imageUrl) {
       throw new Error(imageResult.error || "Image generation failed");
     }
@@ -130,7 +130,7 @@ export async function submitGuess(
     try {
       const result = await calculateSimilarityScore(
         challenge.image_url,
-        prompt, 
+        prompt,
         challengeId,
       );
       score = result.score;
@@ -145,7 +145,7 @@ export async function submitGuess(
     const { error: updateError } = await supabase
       .from("guesses")
       .update({
-        generated_image_url: generatedImageUrl, 
+        generated_image_url: generatedImageUrl,
         score: score,
       })
       .eq("id", guess.id);
@@ -168,7 +168,7 @@ export async function submitGuess(
     };
   } catch (error) {
     console.error("Error in image generation/scoring pipeline:", error);
-    
+
     // Clean up the guess record if something went wrong
     await supabase.from("guesses").delete().eq("id", guess.id);
 
